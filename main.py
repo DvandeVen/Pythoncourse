@@ -1,3 +1,6 @@
-print("Yeah! my own project!")
+# Import
+import requests
+import pandas as pd
 
-test1234
+
+# Call the API to get the data
