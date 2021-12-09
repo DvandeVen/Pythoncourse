@@ -4,11 +4,7 @@ PasswordList = ["pass1"]
 print("Welcome to the Investment Game")
 userType = input("Do you have an account for this Investment Game? please enter y/n:")
 
-# Full name
-# Available amount of money
-# Currencies
-# Limits
-# More user variables?
+#maybe add account info here
 
 if userType == 'n':
     User = input("Please type your username: ")
@@ -34,3 +30,19 @@ else:
             print("Incorrect username or Password")
     else:
         print("Incorrect username or Password")
+
+# Full name
+fullname = input("Please enter your full name: ")
+# Available amount of money
+wallet = input("Please enter your budget: ")
+# Currencies to be added later
+# Limits to be added later
+# More user variables?
+
+print('So your full name is ', fullname, ' and your budget is ', wallet)
+
+
+
+
+
+
