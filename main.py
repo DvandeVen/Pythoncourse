@@ -1,17 +1,30 @@
-# Import
+# Import packages
 import requests
 import pandas as pd
 
+def get_stock_data():
 
-# Call the API to get the data
-response = requests.get("https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=MSFT&interval=5min&outputsize=full&apikey=demo")
+    # Insert which stock you want to get data for
+    symbol = input("What stock are you interested in? ")
+    # Call the API to get the stock price over 5 minutes
+    response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey=demo")
 
-# Since we are retrieving stuff from a web service, it's a good idea to check for the return status code
-# See: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-if response.status_code != 200:
-    raise ValueError("Could not retrieve data, code:", response.status_code)
+    # If you are not getting a response, print error message below
+    # See: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+    if response.status_code != 200:
+        raise ValueError("Could not retrieve data, code:", response.status_code)
 
-# The service sends JSON data, we parse that into a Python datastructure
-raw_data = response.json()
+    # The service sends JSON data, we parse that into a Python datastructure
+    raw_data = response.json()
 
-print(raw_data)
+    # Transpose time series data into a dataframe
+    data = raw_data['Time Series (5min)']
+    df = pd.DataFrame(data).T.apply(pd.to_numeric)
+
+    return df
+    # df.info()
+    # print(df.head())
+
+if __name__ == "__main__":
+    df = get_stock_data()
+    print(df)
