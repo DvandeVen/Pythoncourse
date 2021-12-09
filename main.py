@@ -1,6 +1,7 @@
 # Import packages
 import requests
 import pandas as pd
+import matplotlib.pyplot as plt
 
 def get_stock_data():
 
@@ -21,10 +22,22 @@ def get_stock_data():
     data = raw_data['Time Series (5min)']
     df = pd.DataFrame(data).T.apply(pd.to_numeric)
 
+    # Fix column datatypes and names
+    df.index = pd.DatetimeIndex(df.index)
+    df.rename(columns=lambda s: s[3:], inplace=True)
+
     return df
     # df.info()
     # print(df.head())
+def buy_stocks():
+    last_record = df[0]
+
+    return last_record
 
 if __name__ == "__main__":
     df = get_stock_data()
     print(df)
+    df[['open', 'high', 'low', 'close']].plot()
+    plt.show()
+    last_record = buy_stocks()
+    print(last_record)
