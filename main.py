@@ -153,8 +153,6 @@ def sell_stocks():
 
 def portfolio_info():
     wallet_info = print("Your current cash balance is:", wallet, "euros")
-    value_of_shares =
-
     portfolio_info = print("Your current portfolio is:", portfolio)
     return wallet_info, portfolio_info
 
@@ -168,7 +166,7 @@ def menu():
     global symbol
     global df
     # Show portfolio, Display chart of a share, Buy, sell, Quit
-    print("--------- MENU ---------")
+    print("\n--------- MENU ---------")
     print("1: Show portfolio")
     print("2: Get share info")
     print("3: Buy shares")
