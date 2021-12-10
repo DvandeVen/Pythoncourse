@@ -25,6 +25,7 @@ def user_login():
     print("======================================\n")
     userType = input("Do you have an account for this Investment Game? please enter y/n: ")
     if userType == 'n':
+        print("Please create an account")
         User = input("Please type your username: ")
         UsernameList.append(User)
         Pass = input("Please type your password: ")
@@ -61,16 +62,33 @@ def user_login():
     fullname = input("Please enter your full name: ")
     return fullname
 
-# def default_currency():
-#     # Ask the user which currency he uses
-#     currency = (input("Stock prices are in dollars. What currency are you using? (3 letters) "))
-#
-#     return currency
+def default_currency():
+    # Ask the user which currency he uses
+    currency = (input("Stock prices are in dollars. What currency are you using? (3 letters) "))
+
+    return currency
+
+def get_exchange_rate():
+    global currency
+    # Call the API to get the stock price over 5 minutes
+    response = requests.get(f"https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency={currency}&to_currency=USD&apikey={apiKey}")
+    # If you are not getting a response, print error message below
+    # See: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+    if response.status_code != 200:
+        raise ValueError("Could not retrieve data, code:", response.status_code)
+
+    # The service sends JSON data, we parse that into a Python datastructure
+    raw_data = response.json()
+
+    exchange_rate = round(Decimal(raw_data['Realtime Currency Exchange Rate']['5. Exchange Rate']), 3)
+    print(f"Current exchange rate {currency} to USD is {exchange_rate}")
+
+    return exchange_rate
 
 def wallet():
-    # global currency
+    global currency
     # Available amount of money
-    wallet = round(Decimal(input("Please enter your budget in USD: ")), 3)
+    wallet = round(Decimal(input(f"Please enter your budget in {currency}: ")), 3)
     # Currencies to be added later
     # Limits to be added later
     # More user variables?
@@ -91,6 +109,7 @@ def portfolio_edit():
     return portfolio
 
 def get_stock_data():
+    global exchange_rate
     # Insert which stock you want to get data for
     symbol = input("Please provide the stock name: ")
     # Call the API to get the stock price over 5 minutes
@@ -111,6 +130,10 @@ def get_stock_data():
     df.index = pd.DatetimeIndex(df.index)
     df.rename(columns=lambda s: s[3:], inplace=True)
 
+    # Divide the stock prices in USD by the exchange rate to get the stock prices in the correct currency
+    exchange_rate = float(exchange_rate)
+    for column in ['open', 'high', 'low', 'close']:
+        df[column] = df[column]/exchange_rate
     return df, symbol
     # df.info()
     # print(df.head())
@@ -118,8 +141,9 @@ def get_stock_data():
 def buy_stocks():
     global wallet
     global symbol
+    global currency
     closing_price = round(Decimal(df.tail(1)['close'][0]), 3)
-    print("Current price is: ", closing_price, " USD")
+    print(f"Current price is: {closing_price} {currency}")
     try:
         current_stock_amount = portfolio[symbol]
     except:
@@ -128,7 +152,7 @@ def buy_stocks():
     while True:
         stock_amount = int(input("How many stocks do you want to buy? "))
         total_buying_price = closing_price*stock_amount
-        print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount), "shares of", str(symbol))
+        print("Please confirm if you want to spend", str(total_buying_price), currency, "on", str(stock_amount), "shares of", str(symbol))
         confirmation = input("(y/n) ")
         if confirmation == "y":
             if total_buying_price > wallet:
@@ -147,8 +171,9 @@ def buy_stocks():
 def sell_stocks():
     global wallet
     global symbol
+    global currency
     closing_price = round(Decimal(df.tail(1)['close'][0]), 3)
-    print("Current price is: ", closing_price, " USD")
+    print(f"Current price is: {closing_price} {currency}")
     try:
         current_stock_amount = portfolio[symbol]
     except:
@@ -157,7 +182,7 @@ def sell_stocks():
     while True:
         stock_amount = int(input("How many stocks do you want to sell? "))
         total_selling_price = closing_price*stock_amount
-        print("Please confirm if you want to sell", str(total_selling_price), "USD on", str(stock_amount), "shares of", str(symbol))
+        print("Please confirm if you want to sell", str(total_selling_price), currency, "on", str(stock_amount), "shares of", str(symbol))
         confirmation = input("(y/n) ")
         if confirmation == "y":
             if stock_amount > current_stock_amount:
@@ -170,7 +195,8 @@ def sell_stocks():
             continue
 
 def portfolio_info():
-    wallet_info = print("Your current cash balance is:", wallet, "USD")
+    global currency
+    wallet_info = print("Your current cash balance is:", wallet, currency)
 
     portfolio_info = print("Your current portfolio is:", portfolio)
     return wallet_info, portfolio_info
@@ -225,7 +251,8 @@ def quit():
 
 if __name__ == "__main__":
     fullname = user_login()
-    # currency = default_currency()
+    currency = default_currency()
+    exchange_rate = get_exchange_rate()
     wallet = wallet()
     portfolio_edit = portfolio_edit()
     menu()
