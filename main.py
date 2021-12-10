@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import decimal
 from decimal import Decimal
 
-# Create portfolio dictionary
+# Defining
+apiKey = "6XJBG28TQUI6UA1Y"
 portfolio = {}
 UsernameList = ["Admin"]
 PasswordList = ["Python"]
@@ -62,7 +63,7 @@ def user_login():
 
 def wallet():
     # Available amount of money
-    wallet = round(Decimal(input("Please enter your budget: ")), 3)
+    wallet = round(Decimal(input("Please enter your budget in USD: ")), 3)
     # Currencies to be added later
     # Limits to be added later
     # More user variables?
@@ -86,7 +87,7 @@ def get_stock_data():
     # Insert which stock you want to get data for
     symbol = input("What stock are you interested in? ")
     # Call the API to get the stock price over 5 minutes
-    response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey=demo")
+    response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey={apiKey}")
     # If you are not getting a response, print error message below
     # See: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
     if response.status_code != 200:
@@ -111,11 +112,11 @@ def buy_stocks():
     global wallet
     global symbol
     closing_price = round(Decimal(df.tail(1)['close'][0]), 3)
-    print("Current price is: ", closing_price, " euros")
+    print("Current price is: ", closing_price, " USD")
     while True:
         stock_amount = int(input("How many stocks do you want to buy? "))
         total_buying_price = closing_price*stock_amount
-        print("Please confirm if you want to spend", str(total_buying_price), "euros on", str(stock_amount), "shares of", str(symbol))
+        print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount), "shares of", str(symbol))
         confirmation = input("(y/n) ")
         if confirmation == "y":
             if total_buying_price > wallet:
@@ -135,11 +136,11 @@ def sell_stocks():
     global wallet
     global symbol
     closing_price = round(Decimal(df.tail(1)['close'][0]), 3)
-    print("Current price is: ", closing_price, " euros")
+    print("Current price is: ", closing_price, " USD")
     while True:
         stock_amount = int(input("How many stocks do you want to sell? "))
         total_selling_price = closing_price*stock_amount
-        print("Please confirm if you want to sell", str(total_selling_price), "euros on", str(stock_amount), "shares of", str(symbol))
+        print("Please confirm if you want to sell", str(total_selling_price), "USD on", str(stock_amount), "shares of", str(symbol))
         confirmation = input("(y/n)")
         if confirmation == "y":
             if stock_amount > portfolio[symbol]:
@@ -152,7 +153,8 @@ def sell_stocks():
             continue
 
 def portfolio_info():
-    wallet_info = print("Your current cash balance is:", wallet, "euros")
+    wallet_info = print("Your current cash balance is:", wallet, "USD")
+
     portfolio_info = print("Your current portfolio is:", portfolio)
     return wallet_info, portfolio_info
 
@@ -172,7 +174,7 @@ def menu():
     print("3: Buy shares")
     print("4: Sell shares")
     print("5: Quit")
-    print("---------------------- \n")
+    print("----------------------\n")
     choice = int(input("To which page do you want to go? Enter a number: "))
     if choice == 1:
         portfolio_info()
@@ -201,7 +203,7 @@ def return_to_menu():
         quit()
 
 def quit():
-    print("----------------------")
+    print("\n ----------------------")
     print("Thank you for using our game. Have a good day!")
 
 if __name__ == "__main__":
@@ -226,24 +228,6 @@ if __name__ == "__main__":
 
 
 
-
-
-    # print('So your full name is ', fullname, ' and your budget is ', wallet)
-    #df, symbol = get_stock_data()
-    # print(df)
-
-    # Display chart
-    #df[['open', 'high', 'low', 'close']].plot()
-    #plt.show()
-
-    #if len(portfolio) == 0:
-    #    buyTransaction = buy_stocks()
-    #else:
-    #    typeOfTransaction = input("Do you want to buy or sell stocks? (b/s) ")
-    #    if typeOfTransaction == "b":
-    #        buyTransaction = buy_stocks()
-    #    else:
-     #       sellTransaction = sell_stocks()
 
 
 
