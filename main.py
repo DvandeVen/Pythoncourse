@@ -44,6 +44,7 @@ def user_login():
                 else:
                     print("Incorrect username")
                     get_user_login()
+            break
         elif userType == 'y':
             print("Please login\n")
             get_user_login()
@@ -58,6 +59,7 @@ def user_login():
                 else:
                     print("Incorrect username or Password")
                     get_user_login()
+            break
         else:
             print("Please enter either 'y' or 'n'.")
             userType = input("Do you have an account for this Investment Game? please enter y/n: ")
