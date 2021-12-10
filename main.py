@@ -108,6 +108,35 @@ def portfolio_edit():
             break
     return portfolio
 
+# def search_stock():
+#     search_query = str(input("Please provide your search query: "))
+#
+#     response = requests.get(f"https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={search_query}&apikey={apiKey}")
+#     # See: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+#     if response.status_code != 200:
+#         raise ValueError("Could not retrieve data, code:", response.status_code)
+#
+#     # The service sends JSON data, we parse that into a Python datastructure
+#     raw_data = response.json()
+#
+#     len_results = len(raw_data['bestMatches'])
+#
+#     result = pd.DataFrame()
+#     for index in range(len_results):
+#         result.loc[index, 'symbol'] = raw_data['bestMatches'][index]['1. symbol']
+#         result.loc[index, 'name'] = raw_data['bestMatches'][index]['2. name']
+#         result.loc[index, 'type'] = raw_data['bestMatches'][index]['3. type']
+#         result.loc[index, 'region'] = raw_data['bestMatches'][index]['4. region']
+#         result.loc[index, 'timezone'] = raw_data['bestMatches'][index]['7. timezone']
+#         result.loc[index, 'currency'] = raw_data['bestMatches'][index]['8. currency']
+#
+#     print(result)
+#     print(f"Please specify which stock you meant (1-n):\n"
+#             f"({index1}) Company '{result.loc[index1, 'name']}' from {result.loc[index1, 'region']}")
+#     # print(raw_data)
+#
+#     return search_query
+
 def get_stock_data():
     global exchange_rate
     # Insert which stock you want to get data for
@@ -255,4 +284,6 @@ if __name__ == "__main__":
     exchange_rate = get_exchange_rate()
     wallet = wallet()
     portfolio_edit = portfolio_edit()
+    # search_query = search_stock()
+    # print(search_query)
     menu()
