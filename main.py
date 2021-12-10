@@ -64,6 +64,7 @@ def user_login():
             print("Please enter either 'y' or 'n'.")
             userType = input("Do you have an account for this Investment Game? please enter y/n: ")
 
+    #Question from Synne: Why do we need to know their full name?
     # Full name
     fullname = input("Please enter your full name: ")
     return fullname
@@ -93,8 +94,12 @@ def portfolio_edit():
             moreShares = input("Do you have any other shares? (y/n) ")
             if moreShares == "n":
                 break
-        else:
             break
+        elif portfolio_edit == "n":
+            break
+        else:
+            print("Please enter either 'y' or 'n'.")
+            portfolio_edit = input("Do you have any shares? (y/n) ")
 
     return portfolio
 
@@ -138,18 +143,24 @@ def buy_stocks():
         total_buying_price = closing_price*stock_amount
         print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount), "shares of", str(symbol))
         confirmation = input("(y/n) ")
-        if confirmation == "y":
-            if total_buying_price > wallet:
-                print("You can not afford this")
-            else:
-                wallet -= total_buying_price
-                try:
-                    portfolio[symbol] += stock_amount
-                except:
-                    portfolio[symbol] = stock_amount
+        while True:
+            if confirmation == "y":
+                if total_buying_price > wallet:
+                    print("You can not afford this")
+                else:
+                    wallet -= total_buying_price
+                    try:
+                        portfolio[symbol] += stock_amount
+                    except:
+                        portfolio[symbol] = stock_amount
+                    break
                 break
-        else:
-            continue
+            elif confirmation == "n":
+                continue
+            else:
+                print("Please enter either 'y' or 'n'.")
+                print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount), "shares of", str(symbol))
+                confirmation = input("(y/n) ")
 
 
 def sell_stocks():
