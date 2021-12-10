@@ -155,6 +155,7 @@ def buy_stocks():
                         portfolio[symbol] = stock_amount
                     break
                 break
+                #need to fix this, want code to break out of both loops. Now it continues with the first while
             elif confirmation == "n":
                 continue
             else:
