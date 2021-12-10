@@ -23,7 +23,7 @@ def user_login():
     print("======================================")
     print("Welcome to the Investment Game")
     print("======================================\n")
-    userType = input("Do you have an account for this Investment Game? please enter y/n:")
+    userType = input("Do you have an account for this Investment Game? please enter y/n: ")
     if userType == 'n':
         User = input("Please type your username: ")
         UsernameList.append(User)
@@ -61,7 +61,14 @@ def user_login():
     fullname = input("Please enter your full name: ")
     return fullname
 
+# def default_currency():
+#     # Ask the user which currency he uses
+#     currency = (input("Stock prices are in dollars. What currency are you using? (3 letters) "))
+#
+#     return currency
+
 def wallet():
+    # global currency
     # Available amount of money
     wallet = round(Decimal(input("Please enter your budget in USD: ")), 3)
     # Currencies to be added later
@@ -85,7 +92,7 @@ def portfolio_edit():
 
 def get_stock_data():
     # Insert which stock you want to get data for
-    symbol = input("What stock are you interested in? ")
+    symbol = input("Please provide the stock name: ")
     # Call the API to get the stock price over 5 minutes
     response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey={apiKey}")
     # If you are not getting a response, print error message below
@@ -113,6 +120,11 @@ def buy_stocks():
     global symbol
     closing_price = round(Decimal(df.tail(1)['close'][0]), 3)
     print("Current price is: ", closing_price, " USD")
+    try:
+        current_stock_amount = portfolio[symbol]
+    except:
+        current_stock_amount = 0
+    print("Your portfolio currently holds", current_stock_amount, "stocks of", symbol)
     while True:
         stock_amount = int(input("How many stocks do you want to buy? "))
         total_buying_price = closing_price*stock_amount
@@ -137,14 +149,19 @@ def sell_stocks():
     global symbol
     closing_price = round(Decimal(df.tail(1)['close'][0]), 3)
     print("Current price is: ", closing_price, " USD")
+    try:
+        current_stock_amount = portfolio[symbol]
+    except:
+        current_stock_amount = 0
+    print("Your portfolio currently holds", current_stock_amount, "stocks of", symbol)
     while True:
         stock_amount = int(input("How many stocks do you want to sell? "))
         total_selling_price = closing_price*stock_amount
         print("Please confirm if you want to sell", str(total_selling_price), "USD on", str(stock_amount), "shares of", str(symbol))
-        confirmation = input("(y/n)")
+        confirmation = input("(y/n) ")
         if confirmation == "y":
-            if stock_amount > portfolio[symbol]:
-                print("You can not sell this amount of shares, because they are not available in your portfolio")
+            if stock_amount > current_stock_amount:
+                print("You can not sell this amount of shares, because they are not available in your portfolio. Your portfolio currently holds", current_stock_amount, "stocks of", symbol)
             else:
                 wallet += total_selling_price
                 portfolio[symbol] -= stock_amount
@@ -195,7 +212,7 @@ def menu():
 
 def return_to_menu():
     print("----------------------")
-    return_to_menu = int(input("Do you want to return to the menu (1) or Quit (2)?"))
+    return_to_menu = int(input("Do you want to return to the menu (1) or Quit (2)? "))
     print("----------------------")
     if return_to_menu == 1:
         menu()
@@ -208,27 +225,7 @@ def quit():
 
 if __name__ == "__main__":
     fullname = user_login()
+    # currency = default_currency()
     wallet = wallet()
     portfolio_edit = portfolio_edit()
     menu()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
