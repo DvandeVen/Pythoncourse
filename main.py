@@ -24,42 +24,38 @@ def user_login():
     print("Welcome to the Investment Game")
     print("======================================\n")
     userType = input("Do you have an account for this Investment Game? please enter y/n: ")
-    while True:
-        if userType == 'n':
-            User = input("Please type your username: ")
-            UsernameList.append(User)
-            Pass = input("Please type your password: ")
-            PasswordList.append(Pass)
-            print("You have created your new account with the Investment Game, please login\n")
-            get_user_login()
-            while True:
-                if UserName in UsernameList:  # is User1 in the list?
-                    if Password == PasswordList[UsernameList.index(UserName)]:
-                        print("Log in Success")
-                        break
-                    else:
-                        print("Incorrect Password")
-                        get_user_login()
+    if userType == 'n':
+        User = input("Please type your username: ")
+        UsernameList.append(User)
+        Pass = input("Please type your password: ")
+        PasswordList.append(Pass)
+        print("You have created your new account with the Investment Game, please login\n")
+        get_user_login()
+        while True:
+            if UserName in UsernameList:  # is User1 in the list?
+                if Password == PasswordList[UsernameList.index(UserName)]:
+                    print("Log in Success")
+                    break
                 else:
-                    print("Incorrect username")
+                    print("Incorrect Password")
                     get_user_login()
-        elif userType == 'y':
-            print("Please login\n")
-            get_user_login()
-            while True:
-                if UserName in UsernameList:  # is User1 in the list?
-                    if Password == PasswordList[UsernameList.index(UserName)]:
-                        print("Log in Success")
-                        break
-                    else:
-                        print("Incorrect username or Password")
-                        get_user_login()
+            else:
+                print("Incorrect username")
+                get_user_login()
+    elif userType == 'y':
+        print("Please login\n")
+        get_user_login()
+        while True:
+            if UserName in UsernameList:  # is User1 in the list?
+                if Password == PasswordList[UsernameList.index(UserName)]:
+                    print("Log in Success")
+                    break
                 else:
                     print("Incorrect username or Password")
                     get_user_login()
-        else:
-            print('Please insert either "y" or "n".')
-            userType = input("Do you have an account for this Investment Game? please enter y/n: ")
+            else:
+                print("Incorrect username or Password")
+                get_user_login()
 
     # Full name
     fullname = input("Please enter your full name: ")
@@ -82,16 +78,16 @@ def wallet():
 
 def portfolio_edit():
     portfolio_edit = input("Do you have any shares? (y/n) ")
-    while True:
-        if portfolio_edit == "y":
-            share = input("Which share do you have? ")
-            amount = int(input("How many of that share do you have? "))
-            portfolio[share] = amount
-            moreShares = input("Do you have any other shares? (y/n) ")
-            if moreShares == "n":
-                break
-        else:
+    if portfolio_edit == "y":
+        share = input("Which share do you have? ")
+        amount = int(input("How many of that share do you have? "))
+        portfolio[share] = amount
+        moreShares = input("Do you have any other shares? (y/n) ")
+        if moreShares == "n":
             break
+    else:
+        break
+
     return portfolio
 
 def get_stock_data():
