@@ -78,15 +78,16 @@ def wallet():
 
 def portfolio_edit():
     portfolio_edit = input("Do you have any shares? (y/n) ")
-    if portfolio_edit == "y":
-        share = input("Which share do you have? ")
-        amount = int(input("How many of that share do you have? "))
-        portfolio[share] = amount
-        moreShares = input("Do you have any other shares? (y/n) ")
-        if moreShares == "n":
+    while True:
+        if portfolio_edit == "y":
+            share = input("Which share do you have? ")
+            amount = int(input("How many of that share do you have? "))
+            portfolio[share] = amount
+            moreShares = input("Do you have any other shares? (y/n) ")
+            if moreShares == "n":
+                break
+        else:
             break
-    else:
-        break
 
     return portfolio
 
