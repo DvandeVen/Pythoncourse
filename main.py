@@ -2,50 +2,73 @@
 import requests
 import pandas as pd
 import matplotlib.pyplot as plt
+import decimal
+from decimal import Decimal
 
-UsernameList = ["jacob"]
-PasswordList = ["pass1"]
+# Create portfolio dictionary
+portfolio = {}
 
-print("Welcome to the Investment Game")
-userType = input("Do you have an account for this Investment Game? please enter y/n:")
+def user_login():
+    UsernameList = ["jacob"]
+    PasswordList = ["pass1"]
 
-#maybe add account info here
+    print("Welcome to the Investment Game")
+    userType = input("Do you have an account for this Investment Game? please enter y/n:")
 
-if userType == 'n':
-    User = input("Please type your username: ")
-    UsernameList.append(User)
-    Pass = input("Please type your password: ")
-    PasswordList.append(Pass)
-    print("You have created your new account with the Investment Game, please login\n")
-    UserName = input("Please enter your username: ")
-    Password = input("Please enter your password: ")
-    if UserName in UsernameList:  # is User1 in the list?
-        if Password == PasswordList[UsernameList.index(UserName)]:
-            print("Log in Success")
+    #maybe add account info here
+
+    if userType == 'n':
+        User = input("Please type your username: ")
+        UsernameList.append(User)
+        Pass = input("Please type your password: ")
+        PasswordList.append(Pass)
+        print("You have created your new account with the Investment Game, please login\n")
+        UserName = input("Please enter your username: ")
+        Password = input("Please enter your password: ")
+        while True:
+            if UserName in UsernameList:  # is User1 in the list?
+                if Password == PasswordList[UsernameList.index(UserName)]:
+                    print("Log in Success")
+                    break
+                else:
+                    print("Incorrect Password")
+                    UserName = input("Please enter your username: ")
+                    Password = input("Please enter your password: ")
+            else:
+                print("Incorrect username")
+                UserName = input("Please enter your username: ")
+                Password = input("Please enter your password: ")
     else:
-        print("Incorrect username or Password")
-else:
-    print("Please login\n")
-    UserName = input("Please enter your username: ")
-    Password = input("Please enter your password: ")
-    if UserName in UsernameList:  # is User1 in the list?
-        if Password == PasswordList[UsernameList.index(UserName)]:
-            print("Log in Success")
-        else:
-            print("Incorrect username or Password")
-    else:
-        print("Incorrect username or Password")
+        print("Please login\n")
+        UserName = input("Please enter your username: ")
+        Password = input("Please enter your password: ")
+        while True:
+            if UserName in UsernameList:  # is User1 in the list?
+                if Password == PasswordList[UsernameList.index(UserName)]:
+                    print("Log in Success")
+                    break
+                else:
+                    print("Incorrect username or Password")
+                    UserName = input("Please enter your username: ")
+                    Password = input("Please enter your password: ")
+            else:
+                print("Incorrect username or Password")
+                UserName = input("Please enter your username: ")
+                Password = input("Please enter your password: ")
 
-# Full name
-fullname = input("Please enter your full name: ")
-# Available amount of money
-wallet = input("Please enter your budget: ")
-# Currencies to be added later
-# Limits to be added later
-# More user variables?
+    # Full name
+    fullname = input("Please enter your full name: ")
 
-print('So your full name is ', fullname, ' and your budget is ', wallet)
+    return fullname
 
+def wallet():
+    # Available amount of money
+    wallet = round(Decimal(input("Please enter your budget: ")), 3)
+    # Currencies to be added later
+    # Limits to be added later
+    # More user variables?
+
+    return wallet
 
 def get_stock_data():
 
@@ -70,21 +93,47 @@ def get_stock_data():
     df.index = pd.DatetimeIndex(df.index)
     df.rename(columns=lambda s: s[3:], inplace=True)
 
-    return df
+    return df, symbol
     # df.info()
     # print(df.head())
-def buy_stocks():
-    last_record = df[0]
 
-    return last_record
+def buy_stocks():
+    global wallet
+    closing_price = round(Decimal(df.tail(1)['close'][0]), 3)
+    print("Current price is: ", closing_price, " euros")
+
+    while True:
+        stock_amount = int(input("How many stocks do you want to buy? "))
+        total_buying_price = closing_price*stock_amount
+        print("Please confirm if you want to spend", str(total_buying_price), "euros on", str(stock_amount), "shares of", str(symbol))
+        confirmation = input("(y/n)")
+        if confirmation == "y":
+            if total_buying_price > wallet:
+                print("You can not afford this")
+            else:
+                wallet -= total_buying_price
+                portfolio[symbol] = stock_amount
+                print("Your current wallet is:", wallet, "euros")
+                print("Your current portfolio is:", portfolio)
+                break
+        else:
+            continue
+
+
+    # You can't afford this
+
+    return wallet, portfolio
 
 if __name__ == "__main__":
-    df = get_stock_data()
-    print(df)
-    df[['open', 'high', 'low', 'close']].plot()
-    plt.show()
-    last_record = buy_stocks()
-    print(last_record)
+    # fullname = user_login()
+    wallet = wallet()
+    # print('So your full name is ', fullname, ' and your budget is ', wallet)
+    df, symbol = get_stock_data()
+    # print(df)
+    # df[['open', 'high', 'low', 'close']].plot()
+    # plt.show()
+    closing_price = buy_stocks()
+    print(closing_price)
 
 
 
