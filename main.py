@@ -100,7 +100,11 @@ def portfolio_edit():
                     break
                 else:
                     print("Share not found. Please check for misspellings.")
-            amount = int(input("How many of that share do you have? "))
+            try:
+                amount = int(input("How many of that share do you have? "))
+            except:
+                print("This doesn't look like a number. Please enter a number.")
+                amount = int(input("How many of that share do you have? "))
             portfolio[share] = amount
             moreShares = input("Do you have any other shares? (y/n) ")
             if moreShares == "n":
@@ -151,27 +155,50 @@ def buy_stocks():
         current_stock_amount = 0
     print("Your portfolio currently holds", current_stock_amount, "stocks of", symbol)
     while True:
-        stock_amount = int(input("How many stocks do you want to buy? "))
+        try:
+            stock_amount = int(input("How many stocks do you want to buy? "))
+        except:
+            print("This doesn't look like a number. Please enter a number.")
+            stock_amount = int(input("How many stocks do you want to buy? "))
         total_buying_price = closing_price*stock_amount
-        while True:
-            print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount), "shares of", str(symbol))
-            confirmation = input("(y/n) ")
-            if confirmation != "y" and confirmation != "n":
-                print("Please enter either 'y' or 'n'.")
-                continue
-            if confirmation == "y":
-                if total_buying_price > wallet:
-                    print("You can not afford this")
-                else:
-                    wallet -= total_buying_price
-                    try:
-                        portfolio[symbol] += stock_amount
-                    except:
-                        portfolio[symbol] = stock_amount
-                    break
-            if confirmation == "n":
+        print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount), "shares of", str(symbol))
+        confirmation = input("(y/n) ")
+        if confirmation == "y":
+            if total_buying_price > wallet:
+                print("You can not afford this")
+            else:
+                wallet -= total_buying_price
+                try:
+                    portfolio[symbol] += stock_amount
+                except:
+                    portfolio[symbol] = stock_amount
                 break
-        break
+        elif confirmation == "n":
+            continue
+
+        # while True:
+        #     stock_amount = int(input("How many stocks do you want to buy? "))
+        #     total_buying_price = closing_price * stock_amount
+        #     while True:
+        #         print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount),
+        #               "shares of", str(symbol))
+        #         confirmation = input("(y/n) ")
+        #         if confirmation != "y" and confirmation != "n":
+        #             print("Please enter either 'y' or 'n'.")
+        #             continue
+        #         if confirmation == "y":
+        #             if total_buying_price > wallet:
+        #                 print("You can not afford this")
+        #             else:
+        #                 wallet -= total_buying_price
+        #                 try:
+        #                     portfolio[symbol] += stock_amount
+        #                 except:
+        #                     portfolio[symbol] = stock_amount
+        #                 break
+        #         if confirmation == "n":
+        #             break
+        #     break
 
 def sell_stocks():
     global wallet
@@ -183,20 +210,27 @@ def sell_stocks():
     except:
         current_stock_amount = 0
     print("Your portfolio currently holds", current_stock_amount, "stocks of", symbol)
-    while True:
-        stock_amount = int(input("How many stocks do you want to sell? "))
-        total_selling_price = closing_price*stock_amount
-        print("Please confirm if you want to sell", str(total_selling_price), "USD on", str(stock_amount), "shares of", str(symbol))
-        confirmation = input("(y/n) ")
-        if confirmation == "y":
-            if stock_amount > current_stock_amount:
-                print("You can not sell this amount of shares, because they are not available in your portfolio. Your portfolio currently holds", current_stock_amount, "stocks of", symbol)
+    if current_stock_amount == 0:
+        print("You cannot sell this share, because it is not in your portfolio.")
+    else:
+        while True:
+            try:
+                stock_amount = int(input("How many stocks do you want to sell? "))
+            except:
+                print("This doesn't look like a number. Please enter a number.")
+                stock_amount = int(input("How many stocks do you want to sell? "))
+            total_selling_price = closing_price*stock_amount
+            print("Please confirm if you want to sell", str(total_selling_price), "USD on", str(stock_amount), "shares of", str(symbol))
+            confirmation = input("(y/n) ")
+            if confirmation == "y":
+                if stock_amount > current_stock_amount:
+                    print("You can not sell this amount of shares, because they are not available in your portfolio. Your portfolio currently holds", current_stock_amount, "stocks of", symbol)
+                else:
+                    wallet += total_selling_price
+                    portfolio[symbol] -= stock_amount
+                    break
             else:
-                wallet += total_selling_price
-                portfolio[symbol] -= stock_amount
-                break
-        else:
-            continue
+                continue
 
 def portfolio_info():
     wallet_info = print("Your current cash balance is:", wallet, "USD")
