@@ -113,14 +113,17 @@ def portfolio_edit():
     return portfolio
 
 def get_stock_data():
-    # Insert which stock you want to get data for
-    symbol = input("Please provide the stock name: ")
-    # Call the API to get the stock price over 5 minutes
-    response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey={apiKey}")
-    # If you are not getting a response, print error message below
-    # See: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-    if response.status_code != 200:
-        raise ValueError("Could not retrieve data, code:", response.status_code)
+    while True:
+        # Insert which stock you want to get data for
+        symbol = input("Please provide the stock name: ")
+        # Call the API to get the stock price over 5 minutes
+        response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey={apiKey}")
+        # If you are not getting a response, print error message below
+        raw_data = str(response.json())
+        if "Invalid API call" not in raw_data:
+            break
+        else:
+            print("Share not found. Please check for misspellings.")
 
     # The service sends JSON data, we parse that into a Python datastructure
     raw_data = response.json()
@@ -156,7 +159,7 @@ def buy_stocks():
             if confirmation != "y" and confirmation != "n":
                 print("Please enter either 'y' or 'n'.")
                 continue
-            elif confirmation == "y":
+            if confirmation == "y":
                 if total_buying_price > wallet:
                     print("You can not afford this")
                 else:
@@ -166,7 +169,7 @@ def buy_stocks():
                     except:
                         portfolio[symbol] = stock_amount
                     break
-            elif confirmation == "n":
+            if confirmation == "n":
                 break
         break
 
