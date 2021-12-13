@@ -92,26 +92,24 @@ def portfolio_edit():
     portfolio_edit = input("Do you have any shares? (y/n) ")
     while True:
         if portfolio_edit == "y":
-           while True:
-            share = input("Which share do you have? ")
-            response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={share}&interval=5min&outputsize=full&apikey={apiKey}")
-            if response.status_code != 200:
-                print("Share not found. Please check for misspellings.")
-                continue
-            else:
-                break
+            while True:
+                share = input("Which share do you have? ")
+                response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={share}&interval=5min&outputsize=full&apikey={apiKey}")
+                raw_data = str(response.json())
+                if "Invalid API call" not in raw_data:
+                    break
+                else:
+                    print("Share not found. Please check for misspellings.")
             amount = int(input("How many of that share do you have? "))
             portfolio[share] = amount
             moreShares = input("Do you have any other shares? (y/n) ")
             if moreShares == "n":
                 break
-            break
         elif portfolio_edit == "n":
             break
         else:
             print("Please enter either 'y' or 'n'.")
             portfolio_edit = input("Do you have any shares? (y/n) ")
-
     return portfolio
 
 def get_stock_data():
@@ -152,23 +150,25 @@ def buy_stocks():
     while True:
         stock_amount = int(input("How many stocks do you want to buy? "))
         total_buying_price = closing_price*stock_amount
-        print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount), "shares of", str(symbol))
-        confirmation = input("(y/n) ")
-        if confirmation == "y":
-            if total_buying_price > wallet:
-                print("You can not afford this")
-            else:
-                wallet -= total_buying_price
-                try:
-                    portfolio[symbol] += stock_amount
-                except:
-                    portfolio[symbol] = stock_amount
+        while True:
+            print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount), "shares of", str(symbol))
+            confirmation = input("(y/n) ")
+            if confirmation != "y" and confirmation != "n":
+                print("Please enter either 'y' or 'n'.")
+                continue
+            elif confirmation == "y":
+                if total_buying_price > wallet:
+                    print("You can not afford this")
+                else:
+                    wallet -= total_buying_price
+                    try:
+                        portfolio[symbol] += stock_amount
+                    except:
+                        portfolio[symbol] = stock_amount
+                    break
+            elif confirmation == "n":
                 break
-        elif confirmation == "n":
-            continue
-        #else:
-            #print("Please enter either 'y' or 'n'.")
-
+        break
 
 def sell_stocks():
     global wallet
