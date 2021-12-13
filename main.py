@@ -26,39 +26,44 @@ def user_login():
     print("Welcome to the Investment Game")
     print("======================================\n")
     userType = input("Do you have an account for this Investment Game? please enter y/n: ")
-    if userType == 'n':
-        print("Please create an account")
-        User = input("Please type your username: ")
-        UsernameList.append(User)
-        Pass = input("Please type your password: ")
-        PasswordList.append(Pass)
-        print("You have created your new account with the Investment Game, please login\n")
-        get_user_login()
-        while True:
-            if UserName in UsernameList:  # is User1 in the list?
-                if Password == PasswordList[UsernameList.index(UserName)]:
-                    print("Log in Success")
-                    break
+    while True:
+        if userType == 'n':
+            User = input("Please type your username: ")
+            UsernameList.append(User)
+            Pass = input("Please type your password: ")
+            PasswordList.append(Pass)
+            print("You have created your new account with the Investment Game, please login\n")
+            get_user_login()
+            while True:
+                if UserName in UsernameList:  # is User1 in the list?
+                    if Password == PasswordList[UsernameList.index(UserName)]:
+                        print("Log in Success")
+                        break
+                    else:
+                        print("Incorrect Password")
+                        get_user_login()
                 else:
-                    print("Incorrect Password")
+                    print("Incorrect username")
                     get_user_login()
-            else:
-                print("Incorrect username")
-                get_user_login()
-    else:
-        print("Please login\n")
-        get_user_login()
-        while True:
-            if UserName in UsernameList:  # is User1 in the list?
-                if Password == PasswordList[UsernameList.index(UserName)]:
-                    print("Log in Success")
-                    break
+            break
+        elif userType == 'y':
+            print("Please login\n")
+            get_user_login()
+            while True:
+                if UserName in UsernameList:  # is User1 in the list?
+                    if Password == PasswordList[UsernameList.index(UserName)]:
+                        print("Log in Success")
+                        break
+                    else:
+                        print("Incorrect username or Password")
+                        get_user_login()
                 else:
                     print("Incorrect username or Password")
                     get_user_login()
-            else:
-                print("Incorrect username or Password")
-                get_user_login()
+            break
+        else:
+            print("Please enter either 'y' or 'n'.")
+            userType = input("Do you have an account for this Investment Game? please enter y/n: ")
 
     # Full name
     fullname = input("Please enter your full name: ")
@@ -90,36 +95,59 @@ def get_exchange_rate():
 def wallet():
     global currency
     # Available amount of money
-    wallet = round(Decimal(input(f"Please enter your budget in {currency}: ")), 3)
+    try:
+        wallet = round(Decimal(input(f"Please enter your budget in {currency}: ")), 3)
+    except:
+        print("This doesn't look like a number. Please enter a number.")
+        wallet = round(Decimal(input(f"Please enter your budget in {currency}: ")), 3)
+
     return wallet
 
 def portfolio_edit():
     portfolio_edit = input("Do you have any shares? (y/n) ")
     while True:
         if portfolio_edit == "y":
-            share = input("Which share do you have? ")
-            amount = int(input("How many of that share do you have? "))
+            while True:
+                share = input("Which share do you have? ")
+                response = requests.get(
+                    f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={share}&interval=5min&outputsize=full&apikey={apiKey}")
+                raw_data = str(response.json())
+                if "Invalid API call" not in raw_data:
+                    break
+                else:
+                    print("Share not found. Please check for misspellings.")
+            try:
+                amount = int(input("How many of that share do you have? "))
+            except:
+                print("This doesn't look like a number. Please enter a number.")
+                amount = int(input("How many of that share do you have? "))
             portfolio[share] = amount
             moreShares = input("Do you have any other shares? (y/n) ")
             if moreShares == "n":
                 break
-        else:
+        elif portfolio_edit == "n":
             break
+        else:
+            print("Please enter either 'y' or 'n'.")
+            portfolio_edit = input("Do you have any shares? (y/n) ")
     return portfolio
 
 def get_stock_data():
     global exchange_rate
-    # Insert which stock you want to get data for
-    symbol = input("Please provide the stock name: ")
-    # Call the API to get the stock price over 5 minutes
-    response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey={apiKey}")
-    # If you are not getting a response, print error message below
-    # See: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-    if response.status_code != 200:
-        raise ValueError("Could not retrieve data, code:", response.status_code)
+    while True:
+        # Insert which stock you want to get data for
+        symbol = input("Please provide the stock name: ")
+        # Call the API to get the stock price over 5 minutes
+        response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey={apiKey}")
+        # If you are not getting a response, print error message below
+        raw_data_text = str(response.json())
+        if "Invalid API call" not in raw_data_text:
+            # The service sends JSON data, we parse that into a Python datastructure
+            raw_data = response.json()
 
-    # The service sends JSON data, we parse that into a Python datastructure
-    raw_data = response.json()
+            break
+        else:
+            print("Share not found. Please check for misspellings.")
 
     # Transpose time series data into a dataframe
     data = raw_data['Time Series (5min)']
@@ -134,8 +162,6 @@ def get_stock_data():
     for column in ['open', 'high', 'low', 'close']:
         df[column] = df[column]/exchange_rate
     return df, symbol
-    # df.info()
-    # print(df.head())
 
 def buy_stocks():
     global wallet
@@ -296,7 +322,7 @@ def menu():
     b2 = tk.Button(window, bg='yellow', text="Get share info", command=show_chart, wraplength=70).place(x=200, y=200)
     b3 = tk.Button(window, bg='yellow', text="Buy shares", command=button_buy, height=2).place(x=300, y=200)
     b4 = tk.Button(window, bg='yellow', text="Sell shares", command=button_sell, height=2).place(x=400, y=200)
-    b5 = tk.Button(window, bg='yellow', text="Quit", command=quit, height=2).place(x=500, y=200)
+    b5 = tk.Button(window, bg='yellow', text="Quit", command=exit, height=2).place(x=500, y=200)
     window.mainloop()
 
 def return_to_menu():
@@ -306,11 +332,12 @@ def return_to_menu():
     if return_to_menu == 1:
         menu()
     else:
-        quit()
+        exit()
 
-def quit():
+def exit():
     print("\n ----------------------")
     print("Thank you for using our game. Have a good day!")
+    quit()
 
 if __name__ == "__main__":
     fullname = user_login()
