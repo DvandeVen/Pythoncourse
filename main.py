@@ -5,6 +5,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import decimal
 from decimal import Decimal
+import tkinter as tk
+from tkinter import messagebox
 
 # Defining
 apiKey = "6XJBG28TQUI6UA1Y"
@@ -204,35 +206,65 @@ def show_chart():
     df[['open', 'high', 'low', 'close']].plot()
     plt.show()
 
+def button_buy():
+    global df
+    global symbol
+    df, symbol = get_stock_data()
+    return buy_stocks()
+
+def button_sell():
+    global df
+    global symbol
+    df, symbol = get_stock_data()
+    return sell_stocks()
+
 def menu():
     global wallet
     global symbol
     global df
     # Show portfolio, Display chart of a share, Buy, sell, Quit
-    print("\n--------- MENU ---------")
-    print("1: Show portfolio")
-    print("2: Get share info")
-    print("3: Buy shares")
-    print("4: Sell shares")
-    print("5: Quit")
-    print("----------------------\n")
-    choice = int(input("To which page do you want to go? Enter a number: "))
-    if choice == 1:
-        portfolio_info()
-        return_to_menu()
-    elif choice == 2:
-        show_chart()
-        return_to_menu()
-    elif choice == 3:
-        df, symbol = get_stock_data()
-        buy_stocks()
-        return_to_menu()
-    elif choice == 4:
-        df, symbol = get_stock_data()
-        sell_stocks()
-        return_to_menu()
-    else:
-        quit()
+    # print("\n--------- MENU ---------")
+    # print("1: Show portfolio")
+    # print("2: Get share info")
+    # print("3: Buy shares")
+    # print("4: Sell shares")
+    # print("5: Quit")
+    # print("----------------------\n")
+    # choice = int(input("To which page do you want to go? Enter a number: "))
+    # if choice == 1:
+    #     portfolio_info()
+    #     return_to_menu()
+    # elif choice == 2:
+    #     show_chart()
+    #     return_to_menu()
+    # elif choice == 3:
+    #     df, symbol = get_stock_data()
+    #     buy_stocks()
+    #     return_to_menu()
+    # elif choice == 4:
+    #     df, symbol = get_stock_data()
+    #     sell_stocks()
+    #     return_to_menu()
+    # else:
+    #     quit()
+
+    #Adding GUI menu:
+    global b1
+    global b2
+    global b3
+    global b4
+    global b5
+    window = tk.Tk()
+    window.title('Investment Game')
+    greeting = tk.Label(text="MENU\n Please choose one of the following options:",
+                        anchor='n', foreground="yellow", background="purple", width=100, height=10, pady=100)
+    greeting.pack()
+    b1 = tk.Button(window, bg='yellow', text="Show portfolio", command=portfolio_info, wraplength=70).place(x=100, y=200)
+    b2 = tk.Button(window, bg='yellow', text="Get share info", command=show_chart, wraplength=70).place(x=200, y=200)
+    b3 = tk.Button(window, bg='yellow', text="Buy shares", command=button_buy, height=2).place(x=300, y=200)
+    b4 = tk.Button(window, bg='yellow', text="Sell shares", command=button_sell, height=2).place(x=400, y=200)
+    b5 = tk.Button(window, bg='yellow', text="Quit", command=quit, height=2).place(x=500, y=200)
+    window.mainloop()
 
 def return_to_menu():
     print("----------------------")
