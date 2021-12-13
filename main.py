@@ -193,10 +193,44 @@ def sell_stocks():
 
 def portfolio_info():
     global currency
+    global balance
     wallet_info = print("Your current cash balance is:", wallet, currency)
-
     portfolio_info = print("Your current portfolio is:", portfolio)
-    return wallet_info, portfolio_info
+    balance = calculate_portfolio_balance()
+    portfolio_balance = print("Your current portfolio value is:", balance)
+    return wallet_info, portfolio_info, portfolio_balance
+
+
+def get_stock_price():
+    global exchange_rate
+    global symbol
+    global intervals
+    response = requests.get(
+        f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={symbol}&interval=5min&outputsize=full&apikey={apiKey}")
+    raw_data = response.json()
+    data = raw_data['Time Series (5min)']
+    df = pd.DataFrame(data).T.apply(pd.to_numeric)
+    df.index = pd.DatetimeIndex(df.index)
+    df.rename(columns=lambda s: s[3:], inplace=True)
+    exchange_rate = float(exchange_rate)
+    for column in ['open', 'high', 'low', 'close']:
+        df[column] = df[column] / exchange_rate
+    price = round(Decimal(df.tail(1)['close'][0]), 3)
+    return price
+
+def calculate_portfolio_balance():
+    global symbol
+    global price
+    price = 0
+    balance = 0
+    for x in portfolio:
+        symbol = x
+        price = get_stock_price()
+        balance += (portfolio[x] * price)
+    return balance
+
+#def calculate_portfolio_balance_over_time():
+
 
 def show_chart():
     df, symbol = get_stock_data()
