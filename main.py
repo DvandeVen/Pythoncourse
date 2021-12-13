@@ -78,7 +78,11 @@ def user_login():
 def wallet():
     # global currency
     # Available amount of money
-    wallet = round(Decimal(input("Please enter your budget in USD: ")), 3)
+    try:
+        wallet = round(Decimal(input("Please enter your budget in USD: ")), 3)
+    except:
+        print("This doesn't look like a number. Please enter a number.")
+        wallet = round(Decimal(input("Please enter your budget in USD: ")), 3)
     # Currencies to be added later
     # Limits to be added later
     # More user variables?
@@ -89,6 +93,10 @@ def portfolio_edit():
     while True:
         if portfolio_edit == "y":
             share = input("Which share do you have? ")
+            response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={share}&interval=5min&outputsize=full&apikey={apiKey}")
+            if response.status_code != 200:
+                print("Share not found. Please check for misspellings.")
+                continue
             amount = int(input("How many of that share do you have? "))
             portfolio[share] = amount
             moreShares = input("Do you have any other shares? (y/n) ")
@@ -143,25 +151,20 @@ def buy_stocks():
         total_buying_price = closing_price*stock_amount
         print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount), "shares of", str(symbol))
         confirmation = input("(y/n) ")
-        while True:
-            if confirmation == "y":
-                if total_buying_price > wallet:
-                    print("You can not afford this")
-                else:
-                    wallet -= total_buying_price
-                    try:
-                        portfolio[symbol] += stock_amount
-                    except:
-                        portfolio[symbol] = stock_amount
-                    break
-                break
-                #need to fix this, want code to break out of both loops. Now it continues with the first while
-            elif confirmation == "n":
-                continue
+        if confirmation == "y":
+            if total_buying_price > wallet:
+                print("You can not afford this")
             else:
-                print("Please enter either 'y' or 'n'.")
-                print("Please confirm if you want to spend", str(total_buying_price), "USD on", str(stock_amount), "shares of", str(symbol))
-                confirmation = input("(y/n) ")
+                wallet -= total_buying_price
+                try:
+                    portfolio[symbol] += stock_amount
+                except:
+                    portfolio[symbol] = stock_amount
+                break
+        elif confirmation == "n":
+            continue
+        #else:
+            #print("Please enter either 'y' or 'n'.")
 
 
 def sell_stocks():
