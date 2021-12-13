@@ -93,13 +93,13 @@ def portfolio_edit():
     while True:
         if portfolio_edit == "y":
            while True:
-                share = input("Which share do you have? ")
-                response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={share}&interval=5min&outputsize=full&apikey={apiKey}")
-                if response.status_code != 200:
-                    print("Share not found. Please check for misspellings.")
-                    continue
-                else:
-                    break
+            share = input("Which share do you have? ")
+            response = requests.get(f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={share}&interval=5min&outputsize=full&apikey={apiKey}")
+            if response.status_code != 200:
+                print("Share not found. Please check for misspellings.")
+                continue
+            else:
+                break
             amount = int(input("How many of that share do you have? "))
             portfolio[share] = amount
             moreShares = input("Do you have any other shares? (y/n) ")
