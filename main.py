@@ -87,9 +87,8 @@ def get_exchange_rate():
 
 def wallet():
     global currency
+    # Available amount of money
     wallet = round(Decimal(input(f"Please enter your budget in {currency}: ")), 3)
-    wallet = exchange_rate*wallet
-    print (f"Your budget for the investment game is: {wallet} \n")
     return wallet
 
 def portfolio_edit():
